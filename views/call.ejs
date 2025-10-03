@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Multi-User Video Call</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <link rel="shortcut icon" href="/assets/images/favicon.ico">
+    <script src='/socket.io/socket.io.js'></script>
+    <script type="module" src='/js/rtc.js'></script>
+    <script type="module" src='/js/events.js'></script>
+    
+    <style>
+        :root {
+            --gberetalk-blue: #0066ff;
+            --gberetalk-green: #33cc33;
+            --gberetalk-dark: #0f172a;
+            --gberetalk-light: #ffffff;
+        }
+        
+        body {
+            background: linear-gradient(rgba(0, 102, 255, 0.8), rgba(0, 82, 204, 0.8)), url('/assets/images/gberetalk.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .navbar {
+            background: rgba(15, 23, 42, 0.95) !important;
+            backdrop-filter: blur(10px);
+        }
+        
+        .container-fluid {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            margin: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-info {
+            background-color: var(--gberetalk-blue);
+            border-color: var(--gberetalk-blue);
+        }
+        
+        .btn-info:hover {
+            background-color: #0052cc;
+            border-color: #0052cc;
+        }
+        
+        .form-control {
+            border: 1px solid rgba(0, 102, 255, 0.3);
+        }
+        
+        .form-control:focus {
+            border-color: var(--gberetalk-blue);
+            box-shadow: 0 0 0 0.2rem rgba(0, 102, 255, 0.15);
+        }
+        
+        .local-video {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar fixed-top bg-info rounded-0 d-print-none">
+        <div class="text-white">Appel vidéo</div>
+
+        <div class="pull-right room-comm" hidden>
+            <span class="text-white mr-5">
+                Identifiant Unique : <span id='randomNumber'></span>
+            </span>
+
+            <button class="btn btn-sm rounded-0 btn-no-effect" id='toggle-video' title="Hide Video">
+                <i class="fa fa-video text-white"></i>
+            </button>
+
+            <button class="btn btn-sm rounded-0 btn-no-effect" id='toggle-mute' title="Mute">
+                <i class="fa fa-microphone-alt text-white"></i>
+            </button>
+
+            <button class="btn btn-sm rounded-0 btn-no-effect text-white">
+                <a href="/" class="text-white text-decoration-none"><i class="fa fa-sign-out-alt text-white" title="Leave"></i></a>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container-fluid" id='room-create' hidden>
+        <div class="row">
+            <div class="col-12 h2 mt-5 text-center">Créer Grin (salle)</div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-12 text-center">
+                <span class="form-text small text-danger" id='err-msg'></span>
+            </div>
+
+            <div class="col-12 col-md-4 offset-md-4 mb-3">
+                <label for="room-name">Nom du grin (salle)</label>
+                <input type="text" id='room-name' class="form-control rounded-0" placeholder="Room Name">
+            </div>
+
+            <div class="col-12 col-md-4 offset-md-4 mb-3">
+                <label for="your-name">Votre nom</label>
+                <input type="text" id='your-name' class="form-control rounded-0" placeholder="Your Name">
+            </div>
+
+            <div class="col-12 col-md-4 offset-md-4 mb-3">
+                <button id='create-room' class="btn btn-block rounded-0 btn-info">Créer un Grin (salle)</button>
+            </div>
+
+            <div class="col-12 col-md-4 offset-md-4 mb-3" id='room-created'></div>
+        </div>
+    </div>
+    <div class="container-fluid" id='username-set' hidden>
+        <div class="row">
+            <div class="col-12 h4 mt-5 text-center">Votre nom</div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-12 text-center">
+                <span class="form-text small text-danger" id='err-msg-username'></span>
+            </div>
+
+            <div class="col-12 col-md-4 offset-md-4 mb-3">
+                <label for="username">Votre nom</label>
+                <input type="text" id='username' class="form-control rounded-0" placeholder="Your Name">
+            </div>
+
+            <div class="col-12 col-md-4 offset-md-4 mb-3">
+                <button id='enter-room' class="btn btn-block rounded-0 btn-info">Entrer dans le Grin (salle) </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid room-comm" hidden>
+        <div class="row">
+            <video class="local-video mirror-mode" id='local' volume='0' autoplay muted></video>
+        </div>
+        <div class="row">
+            <div class="col-md-12 main" id='main-section'>
+                <div class="row mt-2 mb-2" id='videos'></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

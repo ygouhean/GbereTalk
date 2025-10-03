@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Inscription | Gbêrêtalk - Causerie sans frein, rigolade sans fin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta content="Node js Socket.io real time working Chat App" name="description" />
+  <meta content="Gbêrêtalk" name="author" />
+  <!-- App favicon -->
+  <link rel="shortcut icon" href="assets/images/favicon.png">
+  <!-- Bootstrap Css -->
+  <link href="assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  <!-- Icons Css -->
+  <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+  <link href="./assets/css/toastr.min.css" rel="stylesheet" />
+  
+  <style>
+    :root {
+      --gberetalk-blue: #0066ff;
+      --gberetalk-green: #33cc33;
+      --gberetalk-dark: #0f172a;
+      --gberetalk-light: #ffffff;
+      --gberetalk-gradient:#0066ff;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: url('/assets/images/gberetalk.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #fff;
+      min-height: 100vh;
+    }
+    
+    .loader_bg {
+      position: fixed;
+      z-index: 9999;
+      background: rgba(255, 255, 255, 0.9);
+      width: 100%;
+      height: 100%;
+      display: none;
+    }
+    
+    .loader {
+      height: 80px;
+      width: 80px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-left: -40px;
+      margin-top: -40px;
+      border: 5px solid var(--gberetalk-blue);
+      border-radius: 50%;
+      border-top: 5px solid var(--gberetalk-green);
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .auth-card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    .auth-header {
+      background: var(--gberetalk-gradient);
+      padding: 25px;
+      text-align: center;
+      color: white;
+    }
+    
+    .auth-logo img {
+      max-height: 100px;
+      margin-bottom: 10px;
+    }
+    
+    .auth-body {
+      padding: 30px 25px;
+    }
+    
+    .form-control {
+      height: 50px;
+      border-radius: 8px;
+      border: 1px solid #e1e1e1;
+      padding-left: 15px;
+      transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+      border-color: var(--gberetalk-blue);
+      box-shadow: 0 0 0 0.2rem rgba(0, 102, 255, 0.15);
+    }
+    
+    .input-group-text {
+      background-color: transparent;
+      border-right: none;
+      color: #6c757d;
+    }
+    
+    .input-group .form-control {
+      border-left: none;
+    }
+    
+    .btn-primary {
+      background: var(--gberetalk-gradient);
+      border: none;
+      border-radius: 8px;
+      height: 50px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
+    }
+    
+    .auth-footer {
+      text-align: center;
+      padding: 20px;
+      color: #ffffff;
+    }
+    
+    .auth-footer a {
+      color: var(--gberetalk-blue);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    
+    .auth-footer a:hover {
+      color: var(--gberetalk-green);
+    }
+    
+    .text-primary {
+      color: var(--gberetalk-blue) !important;
+    }
+    
+    .text-success {
+      color: var(--gberetalk-green) !important;
+    }
+    
+    .text-danger {
+      color: #dc3545 !important;
+      font-size: 12px;
+      margin-top: 5px;
+      display: block;
+    }
+   
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      .auth-body {
+        padding: 25px 20px;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .auth-logo img {
+        max-height: 80px;
+      }
+      
+      .auth-header {
+        padding: 20px 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Loader -->
+  <div class="container-fluid loader_bg">
+    <div class="text-center">
+      <div class="loader"></div>
+    </div>
+  </div>
+
+  <div class="account-pages my-5 pt-sm-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 col-xl-5">
+          <div class="auth-card">
+            <div class="auth-header">
+              <div class="auth-logo mb-3">
+                <img src="assets/images/logo-light.png" alt="GbêrêTalk Logo" class="img-fluid">
+              </div>
+              <h3 class="mb-1">Créer un compte</h3>
+              <p class="mb-0">Rejoignez GbêrêTalk dès maintenant</p>
+            </div>
+            
+            <div class="auth-body">
+              <div class="error_message mb-3"></div>
+              
+              <form id="comment_form" method="post" class="form--signup" autocomplete="on">
+                <div class="mb-3">
+                  <label class="form-label">Identifiant</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="ri-user-2-line"></i>
+                    </span>
+                    <input type="text" id="name" class="form-control" placeholder="Entrez votre identifiant" autocomplete="off" required>
+                  </div>
+                  <span id="userName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Email</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="ri-mail-line"></i>
+                    </span>
+                    <input type="email" id="email" class="form-control" placeholder="Entrez votre email" required>
+                  </div>
+                  <span id="userEmail" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Mot de passe</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="ri-lock-2-line"></i>
+                    </span>
+                    <input type="password" id="password" class="form-control" placeholder="Entrez votre mot de passe" required>
+                  </div>
+                  <span id="userPass" class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label">Localisation</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="ri-user-location-line"></i>
+                    </span>
+                    <input type="text" id="location" class="form-control" placeholder="Entrez votre localisation" required>
+                  </div>
+                  <span id="userLocation" class="text-danger"></span>
+                </div>
+
+                <div class="d-grid mt-4">
+                  <button class="btn btn-primary waves-effect waves-light" type="submit">
+                    <i class="ri-user-add-line me-1"></i> Créer mon compte
+                  </button>
+                </div>
+              </form>
+            </div>
+            
+            <div class="auth-footer">
+              <p>Vous avez déjà un compte ? <a href="login">Se connecter</a></p>
+              <p class="mb-0">
+                &copy; <script>document.write(new Date().getFullYear())</script> GbêrêTalk. 
+                Développé avec <i class="mdi mdi-heart text-danger"></i> par Gysc
+              </p>
+            </div>
+          </div>
+          
+          <div class="text-center mt-4">
+            <a href="/" class="text-muted"><i class="ri-arrow-left-line me-1"></i> Retour à l'accueil</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script src="assets/libs/jquery/jquery.min.js"></script>
+  <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/libs/simplebar/simplebar.min.js"></script>
+  <script src="assets/js/jquery.form.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/axios.min.js"></script>
+  <script src="/js/login.js"></script>
+  <script src="./assets/js/toastr.min.js"></script>
+</body>
+</html>
