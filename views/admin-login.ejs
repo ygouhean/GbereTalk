@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Admin Login | GbêrêTalk</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="/assets/images/favicon.png">
+  <link href="/assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  <link href="/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+  
+  <style>
+    :root {
+      --admin-primary: #6366f1;
+      --admin-dark: #1e293b;
+      --admin-light: #f8fafc;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .admin-login-container {
+      max-width: 450px;
+      width: 100%;
+      padding: 20px;
+    }
+    
+    .admin-card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+    
+    .admin-header {
+      background: linear-gradient(135deg, var(--admin-primary) 0%, #8b5cf6 100%);
+      padding: 40px 30px;
+      text-align: center;
+      color: white;
+    }
+    
+    .admin-header i {
+      font-size: 60px;
+      margin-bottom: 15px;
+    }
+    
+    .admin-header h2 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    
+    .admin-header p {
+      margin: 5px 0 0;
+      opacity: 0.9;
+      font-size: 14px;
+    }
+    
+    .admin-body {
+      padding: 40px 30px;
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: var(--admin-dark);
+      margin-bottom: 8px;
+    }
+    
+    .form-control {
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 15px;
+      font-size: 15px;
+      transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+      border-color: var(--admin-primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    .input-group-text {
+      background: transparent;
+      border: 2px solid #e2e8f0;
+      border-right: none;
+      border-radius: 10px 0 0 10px;
+    }
+    
+    .input-group .form-control {
+      border-left: none;
+      border-radius: 0 10px 10px 0;
+    }
+    
+    .btn-admin {
+      background: linear-gradient(135deg, var(--admin-primary) 0%, #8b5cf6 100%);
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+      width: 100%;
+      transition: all 0.3s;
+    }
+    
+    .btn-admin:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+    
+    .alert {
+      border-radius: 10px;
+      border: none;
+      padding: 12px 15px;
+    }
+    
+    .alert-danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    
+    .back-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .back-link a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.3s;
+    }
+    
+    .back-link a:hover {
+      opacity: 0.8;
+    }
+    
+    .loader {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 10px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .btn-admin.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    
+    .btn-admin.loading .loader {
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="admin-login-container">
+    <div class="admin-card">
+      <div class="admin-header">
+        <i class="ri-shield-user-line"></i>
+        <h2>Espace Admin</h2>
+        <p>GbêrêTalk Administration</p>
+      </div>
+      
+      <div class="admin-body">
+        <div id="alert-container"></div>
+        
+        <form id="adminLoginForm">
+          <div class="mb-3">
+            <label for="email" class="form-label">
+              <i class="ri-mail-line me-1"></i> Email Administrateur
+            </label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="ri-mail-line"></i>
+              </span>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="email" 
+                name="email"
+                placeholder="admin@gberetalk.com"
+                required
+              >
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <label for="password" class="form-label">
+              <i class="ri-lock-password-line me-1"></i> Mot de passe
+            </label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="ri-lock-password-line"></i>
+              </span>
+              <input 
+                type="password" 
+                class="form-control" 
+                id="password" 
+                name="password"
+                placeholder="••••••••"
+                required
+              >
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-admin">
+            <span class="btn-text">Se connecter</span>
+            <div class="loader"></div>
+          </button>
+        </form>
+      </div>
+    </div>
+    
+    <div class="back-link">
+      <a href="/">
+        <i class="ri-arrow-left-line me-1"></i> Retour au site
+      </a>
+    </div>
+  </div>
+
+  <script src="/assets/libs/jquery/jquery.min.js"></script>
+  <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const btn = this.querySelector('.btn-admin');
+      const alertContainer = document.getElementById('alert-container');
+      
+      // Afficher le loader
+      btn.classList.add('loading');
+      alertContainer.innerHTML = '';
+      
+      const formData = {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+      };
+      
+      try {
+        const response = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.status === 'success') {
+          // Stocker le token
+          localStorage.setItem('admin_token', data.token);
+          localStorage.setItem('admin_data', JSON.stringify(data.data.admin));
+          
+          // Rediriger vers le dashboard
+          window.location.href = '/admin/dashboard';
+        } else {
+          // Afficher l'erreur
+          alertContainer.innerHTML = `
+            <div class="alert alert-danger">
+              <i class="ri-error-warning-line me-2"></i>
+              ${data.message || 'Email ou mot de passe incorrect'}
+            </div>
+          `;
+        }
+      } catch (error) {
+        alertContainer.innerHTML = `
+          <div class="alert alert-danger">
+            <i class="ri-error-warning-line me-2"></i>
+            Une erreur est survenue. Veuillez réessayer.
+          </div>
+        `;
+      } finally {
+        btn.classList.remove('loading');
+      }
+    });
+  </script>
+</body>
+</html>

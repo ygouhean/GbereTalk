@@ -68,6 +68,9 @@ const {
 const { log } = require("console");
 dotenv.config({ path: "./config.env" });
 
+// Configuration Mongoose pour éviter l'avertissement de dépréciation
+mongoose.set('strictQuery', false);
+
 /* ---------for Local database connection---------- */
 /* ---------const DB = process.env.DATABASE_LOCAL; ----------*/
 

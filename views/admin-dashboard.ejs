@@ -1,0 +1,1868 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Dashboard Admin | GbêrêTalk</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="/assets/images/favicon.png">
+  <link href="/assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="/assets/css/icons.min.css" rel="stylesheet" />
+  
+  <style>
+    :root {
+      --admin-primary: #6366f1;
+      --admin-success: #10b981;
+      --admin-warning: #f59e0b;
+      --admin-danger: #ef4444;
+      --admin-dark: #1e293b;
+      --admin-light: #f8fafc;
+      --sidebar-width: 260px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--admin-light);
+      color: var(--admin-dark);
+    }
+    
+    /* Sidebar */
+    .admin-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      overflow-y: auto;
+      z-index: 1000;
+      transition: transform 0.3s;
+    }
+    
+    .sidebar-header {
+      padding: 25px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    
+    .sidebar-logo i {
+      font-size: 32px;
+      margin-right: 10px;
+    }
+    
+    .sidebar-menu {
+      padding: 20px 0;
+    }
+    
+    .menu-item {
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .menu-item:hover,
+    .menu-item.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    .menu-item i {
+      font-size: 20px;
+      margin-right: 12px;
+      width: 24px;
+    }
+    
+    .menu-section-title {
+      padding: 20px 20px 10px;
+      font-size: 12px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    
+    /* Main Content */
+    .admin-main {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+    }
+    
+    /* Topbar */
+    .admin-topbar {
+      background: white;
+      padding: 15px 30px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    
+    .topbar-left h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--admin-dark);
+      margin: 0;
+    }
+    
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .admin-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      padding: 8px 15px;
+      border-radius: 10px;
+      transition: background 0.3s;
+    }
+    
+    .admin-profile:hover {
+      background: var(--admin-light);
+    }
+    
+    .admin-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--admin-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+    }
+    
+    .btn-logout {
+      background: var(--admin-danger);
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-logout:hover {
+      background: #dc2626;
+      transform: translateY(-2px);
+    }
+    
+    /* Content */
+    .admin-content {
+      padding: 30px;
+    }
+    
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+    
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    
+    .stat-icon.primary { background: rgba(99, 102, 241, 0.1); color: var(--admin-primary); }
+    .stat-icon.success { background: rgba(16, 185, 129, 0.1); color: var(--admin-success); }
+    .stat-icon.warning { background: rgba(245, 158, 11, 0.1); color: var(--admin-warning); }
+    .stat-icon.danger { background: rgba(239, 68, 68, 0.1); color: var(--admin-danger); }
+    
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--admin-dark);
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      color: #64748b;
+      font-size: 14px;
+    }
+    
+    .stat-trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .stat-trend.up {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--admin-success);
+    }
+    
+    .stat-trend.down {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--admin-danger);
+    }
+    
+    /* Content Sections */
+    .content-section {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--admin-light);
+    }
+    
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--admin-dark);
+    }
+    
+    /* Table */
+    .admin-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    
+    .admin-table thead th {
+      background: var(--admin-light);
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--admin-dark);
+      font-size: 14px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .admin-table tbody td {
+      padding: 15px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .admin-table tbody tr:hover {
+      background: var(--admin-light);
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    
+    .user-details h6 {
+      margin: 0;
+      font-weight: 600;
+      color: var(--admin-dark);
+    }
+    
+    .user-details p {
+      margin: 0;
+      font-size: 13px;
+      color: #64748b;
+    }
+    
+    .badge {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .badge-success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--admin-success);
+    }
+    
+    .badge-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--admin-danger);
+    }
+    
+    .badge-warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--admin-warning);
+    }
+    
+    /* Action Buttons */
+    .action-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.3s;
+      margin: 0 3px;
+    }
+    
+    .btn-view {
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--admin-primary);
+    }
+    
+    .btn-block {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--admin-warning);
+    }
+    
+    .btn-delete {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--admin-danger);
+    }
+    
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Search and Filters */
+    .filters-bar {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+    }
+    
+    .search-box input {
+      width: 100%;
+      padding: 10px 15px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--admin-primary);
+    }
+    
+    .filter-select {
+      padding: 10px 15px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 40px;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f4f6;
+      border-top-color: var(--admin-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .admin-sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .admin-sidebar.show {
+        transform: translateX(0);
+      }
+      
+      .admin-main {
+        margin-left: 0;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .topbar-left h1 {
+        font-size: 18px;
+      }
+      
+      .admin-content {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="admin-sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <i class="ri-shield-user-line"></i>
+        <span>Admin Panel</span>
+      </div>
+    </div>
+    
+    <div class="sidebar-menu">
+      <div class="menu-section-title">Principal</div>
+      <a href="#" class="menu-item active" data-section="dashboard">
+        <i class="ri-dashboard-line"></i>
+        <span>Tableau de bord</span>
+      </a>
+      
+      <div class="menu-section-title">Gestion</div>
+      <a href="#" class="menu-item" data-section="users">
+        <i class="ri-user-line"></i>
+        <span>Utilisateurs</span>
+      </a>
+      <a href="#" class="menu-item" data-section="groups">
+        <i class="ri-group-line"></i>
+        <span>Groupes</span>
+      </a>
+      <a href="#" class="menu-item" data-section="messages">
+        <i class="ri-message-3-line"></i>
+        <span>Messages</span>
+      </a>
+      
+      <div class="menu-section-title">Administration</div>
+      <a href="#" class="menu-item" data-section="admins">
+        <i class="ri-admin-line"></i>
+        <span>Administrateurs</span>
+      </a>
+      <a href="#" class="menu-item" data-section="settings">
+        <i class="ri-settings-3-line"></i>
+        <span>Paramètres</span>
+      </a>
+    </div>
+  </div>
+  
+  <!-- Main Content -->
+  <div class="admin-main">
+    <!-- Topbar -->
+    <div class="admin-topbar">
+      <div class="topbar-left">
+        <h1 id="page-title">Tableau de bord</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="admin-profile">
+          <div class="admin-avatar" id="admin-avatar">A</div>
+          <div>
+            <div style="font-weight: 600;" id="admin-name">Admin</div>
+            <div style="font-size: 12px; color: #64748b;" id="admin-role">Super Admin</div>
+          </div>
+        </div>
+        <button class="btn-logout" onclick="logout()">
+          <i class="ri-logout-circle-line me-1"></i> Déconnexion
+        </button>
+      </div>
+    </div>
+    
+    <!-- Content -->
+    <div class="admin-content">
+      <!-- Dashboard Section -->
+      <div id="dashboard-section">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <div>
+                <div class="stat-value" id="total-users">0</div>
+                <div class="stat-label">Total Utilisateurs</div>
+              </div>
+              <div class="stat-icon primary">
+                <i class="ri-user-line"></i>
+              </div>
+            </div>
+            <div class="stat-trend up" id="users-trend">
+              <i class="ri-arrow-up-line"></i>
+              <span>+12% cette semaine</span>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <div>
+                <div class="stat-value" id="active-users">0</div>
+                <div class="stat-label">Utilisateurs Actifs</div>
+              </div>
+              <div class="stat-icon success">
+                <i class="ri-user-star-line"></i>
+              </div>
+            </div>
+            <div class="stat-trend up">
+              <i class="ri-arrow-up-line"></i>
+              <span>+8% aujourd'hui</span>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <div>
+                <div class="stat-value" id="total-messages">0</div>
+                <div class="stat-label">Messages Envoyés</div>
+              </div>
+              <div class="stat-icon warning">
+                <i class="ri-message-3-line"></i>
+              </div>
+            </div>
+            <div class="stat-trend up">
+              <i class="ri-arrow-up-line"></i>
+              <span>+24% ce mois</span>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <div>
+                <div class="stat-value" id="total-groups">0</div>
+                <div class="stat-label">Groupes Créés</div>
+              </div>
+              <div class="stat-icon danger">
+                <i class="ri-group-line"></i>
+              </div>
+            </div>
+            <div class="stat-trend up">
+              <i class="ri-arrow-up-line"></i>
+              <span>+5% cette semaine</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Recent Users -->
+        <div class="content-section">
+          <div class="section-header">
+            <h3 class="section-title">Utilisateurs les plus actifs</h3>
+          </div>
+          <div id="top-users-container">
+            <div class="loading">
+              <div class="spinner"></div>
+              <p>Chargement...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Users Section -->
+      <div id="users-section" style="display: none;">
+        <div class="content-section">
+          <div class="section-header">
+            <h3 class="section-title">Gestion des Utilisateurs</h3>
+          </div>
+          
+          <div class="filters-bar">
+            <div class="search-box">
+              <input 
+                type="text" 
+                id="user-search" 
+                placeholder="Rechercher par nom ou email..."
+              >
+            </div>
+            <select class="filter-select" id="user-filter">
+              <option value="all">Tous les utilisateurs</option>
+              <option value="active">Actifs</option>
+              <option value="blocked">Bloqués</option>
+            </select>
+          </div>
+          
+          <div id="users-table-container">
+            <div class="loading">
+              <div class="spinner"></div>
+              <p>Chargement des utilisateurs...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Groups Section -->
+      <div id="groups-section" style="display: none;">
+        <div class="content-section">
+          <div class="section-header">
+            <h3 class="section-title">Gestion des Groupes</h3>
+            <button class="btn btn-primary" onclick="refreshGroups()">
+              <i class="ri-refresh-line me-1"></i> Actualiser
+            </button>
+          </div>
+          
+          <div class="filters-bar">
+            <div class="search-box">
+              <input 
+                type="text" 
+                id="group-search" 
+                placeholder="Rechercher un groupe..."
+              >
+            </div>
+            <select class="filter-select" id="group-sort">
+              <option value="recent">Plus récents</option>
+              <option value="members">Plus de membres</option>
+              <option value="messages">Plus actifs</option>
+            </select>
+          </div>
+          
+          <div id="groups-table-container">
+            <div class="loading">
+              <div class="spinner"></div>
+              <p>Chargement des groupes...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Messages Section -->
+      <div id="messages-section" style="display: none;">
+        <div class="content-section">
+          <div class="section-header">
+            <h3 class="section-title">Modération des Messages</h3>
+            <button class="btn btn-primary" onclick="refreshMessages()">
+              <i class="ri-refresh-line me-1"></i> Actualiser
+            </button>
+          </div>
+          
+          <div class="filters-bar">
+            <div class="search-box">
+              <input 
+                type="text" 
+                id="message-search" 
+                placeholder="Rechercher dans les messages..."
+              >
+            </div>
+            <select class="filter-select" id="message-filter">
+              <option value="all">Tous les messages</option>
+              <option value="today">Aujourd'hui</option>
+              <option value="week">Cette semaine</option>
+              <option value="files">Avec fichiers</option>
+            </select>
+          </div>
+          
+          <div id="messages-table-container">
+            <div class="loading">
+              <div class="spinner"></div>
+              <p>Chargement des messages...</p>
+            </div>
+          </div>
+          
+          <div class="pagination-container" style="margin-top: 20px; text-align: center;">
+            <button class="btn btn-secondary" id="prev-messages" onclick="loadPreviousMessages()">
+              <i class="ri-arrow-left-line"></i> Précédent
+            </button>
+            <span id="messages-page-info" style="margin: 0 15px;">Page 1</span>
+            <button class="btn btn-secondary" id="next-messages" onclick="loadNextMessages()">
+              Suivant <i class="ri-arrow-right-line"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Admins Section -->
+      <div id="admins-section" style="display: none;">
+        <div class="content-section">
+          <div class="section-header">
+            <h3 class="section-title">Gestion des Administrateurs</h3>
+            <button class="btn btn-primary" onclick="showCreateAdminModal()" id="create-admin-btn">
+              <i class="ri-user-add-line me-1"></i> Créer un Admin
+            </button>
+          </div>
+          
+          <div id="admins-table-container">
+            <div class="loading">
+              <div class="spinner"></div>
+              <p>Chargement des administrateurs...</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Modal Create Admin -->
+        <div class="modal fade" id="createAdminModal" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Créer un Nouvel Administrateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <form id="createAdminForm">
+                  <div class="mb-3">
+                    <label class="form-label">Nom</label>
+                    <input type="text" class="form-control" id="new-admin-name" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="new-admin-email" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" class="form-control" id="new-admin-password" required minlength="6">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Rôle</label>
+                    <select class="form-control" id="new-admin-role">
+                      <option value="admin">Admin</option>
+                      <option value="moderator">Moderator</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Permissions</label>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="perm-delete-users">
+                      <label class="form-check-label" for="perm-delete-users">
+                        Supprimer des utilisateurs
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="perm-block-users" checked>
+                      <label class="form-check-label" for="perm-block-users">
+                        Bloquer des utilisateurs
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="perm-view-messages">
+                      <label class="form-check-label" for="perm-view-messages">
+                        Voir les messages
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="perm-manage-groups">
+                      <label class="form-check-label" for="perm-manage-groups">
+                        Gérer les groupes
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="perm-view-stats" checked>
+                      <label class="form-check-label" for="perm-view-stats">
+                        Voir les statistiques
+                      </label>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="createAdmin()">Créer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Settings Section -->
+      <div id="settings-section" style="display: none;">
+        <div class="content-section">
+          <h3 class="section-title">Paramètres de l'Application</h3>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">Informations Générales</h5>
+                  <div class="mb-3">
+                    <label class="form-label">Nom de l'application</label>
+                    <input type="text" class="form-control" value="GbêrêTalk" readonly>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Version</label>
+                    <input type="text" class="form-control" value="1.0.0" readonly>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Environnement</label>
+                    <input type="text" class="form-control" value="Production" readonly>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">Paramètres de Sécurité</h5>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="two-factor-auth">
+                    <label class="form-check-label" for="two-factor-auth">
+                      Authentification à deux facteurs
+                    </label>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="auto-block" checked>
+                    <label class="form-check-label" for="auto-block">
+                      Blocage automatique (5 tentatives)
+                    </label>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Durée de session (minutes)</label>
+                    <input type="number" class="form-control" value="60">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">Limites et Quotas</h5>
+                  <div class="mb-3">
+                    <label class="form-label">Taille max des fichiers (MB)</label>
+                    <input type="number" class="form-control" value="20">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Messages par minute</label>
+                    <input type="number" class="form-control" value="30">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Membres max par groupe</label>
+                    <input type="number" class="form-control" value="100">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">Notifications</h5>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="email-notif" checked>
+                    <label class="form-check-label" for="email-notif">
+                      Notifications par email
+                    </label>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="admin-alerts" checked>
+                    <label class="form-check-label" for="admin-alerts">
+                      Alertes administrateur
+                    </label>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="maintenance-mode">
+                    <label class="form-check-label" for="maintenance-mode">
+                      Mode maintenance
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="text-end">
+            <button class="btn btn-primary" onclick="saveSettings()">
+              <i class="ri-save-line me-1"></i> Enregistrer les Paramètres
+            </button>
+          </div>
+        </div>
+        
+        <!-- Section Backup -->
+        <div class="content-section mt-3">
+          <h3 class="section-title">Sauvegarde et Maintenance</h3>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="card text-center">
+                <div class="card-body">
+                  <i class="ri-database-2-line" style="font-size: 48px; color: var(--admin-primary);"></i>
+                  <h5 class="mt-3">Sauvegarder la Base de Données</h5>
+                  <p class="text-muted">Créer une sauvegarde complète</p>
+                  <button class="btn btn-primary" onclick="backupDatabase()">
+                    <i class="ri-download-line"></i> Sauvegarder
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card text-center">
+                <div class="card-body">
+                  <i class="ri-file-chart-line" style="font-size: 48px; color: var(--admin-success);"></i>
+                  <h5 class="mt-3">Exporter les Données</h5>
+                  <p class="text-muted">Exporter en CSV ou JSON</p>
+                  <button class="btn btn-success" onclick="exportData()">
+                    <i class="ri-file-excel-line"></i> Exporter
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card text-center">
+                <div class="card-body">
+                  <i class="ri-delete-bin-line" style="font-size: 48px; color: var(--admin-danger);"></i>
+                  <h5 class="mt-3">Nettoyer les Données</h5>
+                  <p class="text-muted">Supprimer les données anciennes</p>
+                  <button class="btn btn-danger" onclick="cleanupData()">
+                    <i class="ri-brush-line"></i> Nettoyer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/libs/jquery/jquery.min.js"></script>
+  <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/assets/js/sweetalert.min.js"></script>
+  
+  <script>
+    // Vérifier l'authentification
+    const adminToken = localStorage.getItem('admin_token');
+    const adminData = JSON.parse(localStorage.getItem('admin_data') || '{}');
+    
+    if (!adminToken) {
+      window.location.href = '/admin/login';
+    }
+    
+    // Afficher les infos admin
+    if (adminData.name) {
+      document.getElementById('admin-name').textContent = adminData.name;
+      document.getElementById('admin-role').textContent = adminData.role === 'super_admin' ? 'Super Admin' : 'Admin';
+      document.getElementById('admin-avatar').textContent = adminData.name.charAt(0).toUpperCase();
+    }
+    
+    // Headers pour les requêtes API
+    const headers = {
+      'Authorization': `Bearer ${adminToken}`,
+      'Content-Type': 'application/json'
+    };
+    
+    // Charger les statistiques
+    async function loadDashboardStats() {
+      try {
+        const response = await fetch('/api/admin/dashboard/stats', { headers });
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          const stats = data.data.stats;
+          document.getElementById('total-users').textContent = stats.totalUsers;
+          document.getElementById('active-users').textContent = stats.activeUsers;
+          document.getElementById('total-messages').textContent = stats.totalMessages;
+          document.getElementById('total-groups').textContent = stats.totalGroups;
+          
+          // Charger les top users
+          loadTopUsers(data.data.topUsers);
+        }
+      } catch (error) {
+        console.error('Erreur:', error);
+      }
+    }
+    
+    // Afficher les top users
+    function loadTopUsers(users) {
+      const container = document.getElementById('top-users-container');
+      
+      if (!users || users.length === 0) {
+        container.innerHTML = '<p>Aucun utilisateur actif</p>';
+        return;
+      }
+      
+      let html = '<table class="admin-table"><thead><tr>';
+      html += '<th>Utilisateur</th><th>Messages</th><th>Actions</th>';
+      html += '</tr></thead><tbody>';
+      
+      users.forEach(user => {
+        html += `
+          <tr>
+            <td>
+              <div class="user-info">
+                <img src="/assets/images/users/${user.image || 'default_image.jpg'}" class="user-avatar" alt="">
+                <div class="user-details">
+                  <h6>${user.name}</h6>
+                  <p>${user.email}</p>
+                </div>
+              </div>
+            </td>
+            <td><strong>${user.messageCount}</strong> messages</td>
+            <td>
+              <button class="action-btn btn-view" onclick="viewUser('${user._id}')">
+                <i class="ri-eye-line"></i> Voir
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+    
+    // Charger les utilisateurs
+    async function loadUsers(search = '', filter = 'all') {
+      const container = document.getElementById('users-table-container');
+      container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Chargement...</p></div>';
+      
+      try {
+        const response = await fetch(`/api/admin/users?search=${search}&filter=${filter}`, { headers });
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          displayUsersTable(data.data.users);
+        }
+      } catch (error) {
+        console.error('Erreur:', error);
+        container.innerHTML = '<p>Erreur de chargement</p>';
+      }
+    }
+    
+    // Afficher le tableau des utilisateurs
+    function displayUsersTable(users) {
+      const container = document.getElementById('users-table-container');
+      
+      if (!users || users.length === 0) {
+        container.innerHTML = '<p>Aucun utilisateur trouvé</p>';
+        return;
+      }
+      
+      let html = '<table class="admin-table"><thead><tr>';
+      html += '<th>Utilisateur</th><th>Statut</th><th>Inscrit le</th><th>Actions</th>';
+      html += '</tr></thead><tbody>';
+      
+      users.forEach(user => {
+        const statusBadge = user.isBlocked ? 
+          '<span class="badge badge-danger">Bloqué</span>' :
+          user.isActive ? 
+            '<span class="badge badge-success">Actif</span>' :
+            '<span class="badge badge-warning">Inactif</span>';
+        
+        const date = new Date(user.createdAt).toLocaleDateString('fr-FR');
+        
+        html += `
+          <tr>
+            <td>
+              <div class="user-info">
+                <img src="/assets/images/users/${user.image || 'default_image.jpg'}" class="user-avatar" alt="">
+                <div class="user-details">
+                  <h6>${user.name}</h6>
+                  <p>${user.email}</p>
+                </div>
+              </div>
+            </td>
+            <td>${statusBadge}</td>
+            <td>${date}</td>
+            <td>
+              <button class="action-btn btn-view" onclick="viewUser('${user._id}')">
+                <i class="ri-eye-line"></i>
+              </button>
+              ${!user.isBlocked ? 
+                `<button class="action-btn btn-block" onclick="blockUser('${user._id}', '${user.name}')">
+                  <i class="ri-forbid-line"></i>
+                </button>` :
+                `<button class="action-btn btn-view" onclick="unblockUser('${user._id}', '${user.name}')">
+                  <i class="ri-check-line"></i>
+                </button>`
+              }
+              <button class="action-btn btn-delete" onclick="deleteUser('${user._id}', '${user.name}')">
+                <i class="ri-delete-bin-line"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+    
+    // Bloquer un utilisateur
+    async function blockUser(userId, userName) {
+      const result = await swal({
+        title: "Bloquer l'utilisateur ?",
+        text: `Voulez-vous vraiment bloquer ${userName} ?`,
+        icon: "warning",
+        buttons: ["Annuler", "Bloquer"],
+        dangerMode: true,
+      });
+      
+      if (result) {
+        try {
+          const response = await fetch(`/api/admin/users/${userId}/block`, {
+            method: 'PATCH',
+            headers,
+            body: JSON.stringify({ reason: 'Bloqué par l\'administrateur' })
+          });
+          
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            swal("Succès!", "Utilisateur bloqué avec succès", "success");
+            loadUsers();
+          } else {
+            swal("Erreur!", data.message, "error");
+          }
+        } catch (error) {
+          swal("Erreur!", "Une erreur est survenue", "error");
+        }
+      }
+    }
+    
+    // Débloquer un utilisateur
+    async function unblockUser(userId, userName) {
+      try {
+        const response = await fetch(`/api/admin/users/${userId}/unblock`, {
+          method: 'PATCH',
+          headers
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          swal("Succès!", "Utilisateur débloqué avec succès", "success");
+          loadUsers();
+        } else {
+          swal("Erreur!", data.message, "error");
+        }
+      } catch (error) {
+        swal("Erreur!", "Une erreur est survenue", "error");
+      }
+    }
+    
+    // Supprimer un utilisateur
+    async function deleteUser(userId, userName) {
+      const result = await swal({
+        title: "Supprimer l'utilisateur ?",
+        text: `Voulez-vous vraiment supprimer ${userName} ? Cette action est irréversible !`,
+        icon: "warning",
+        buttons: ["Annuler", "Supprimer"],
+        dangerMode: true,
+      });
+      
+      if (result) {
+        try {
+          const response = await fetch(`/api/admin/users/${userId}`, {
+            method: 'DELETE',
+            headers
+          });
+          
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            swal("Supprimé!", "Utilisateur supprimé avec succès", "success");
+            loadUsers();
+            loadDashboardStats();
+          } else {
+            swal("Erreur!", data.message, "error");
+          }
+        } catch (error) {
+          swal("Erreur!", "Une erreur est survenue", "error");
+        }
+      }
+    }
+    
+    // Voir les détails d'un utilisateur
+    function viewUser(userId) {
+      swal("Info", "Fonctionnalité en cours de développement", "info");
+    }
+    
+    // ============================================
+    // GESTION DES GROUPES
+    // ============================================
+    
+    async function loadGroups(search = '', sort = 'recent') {
+      try {
+        const response = await fetch(`/api/admin/groups?search=${search}&sort=${sort}`, {
+          headers
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          displayGroups(data.data.groups);
+        }
+      } catch (error) {
+        console.error('Erreur chargement groupes:', error);
+      }
+    }
+    
+    function displayGroups(groups) {
+      const container = document.getElementById('groups-table-container');
+      
+      if (!groups || groups.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted">Aucun groupe trouvé</p>';
+        return;
+      }
+      
+      let html = `
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Nom du Groupe</th>
+              <th>Créateur</th>
+              <th>Membres</th>
+              <th>Messages</th>
+              <th>Créé le</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      groups.forEach(group => {
+        const createdAt = new Date(group.createdAt).toLocaleDateString('fr-FR');
+        
+        html += `
+          <tr>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">${group.name?.charAt(0).toUpperCase() || 'G'}</div>
+                <div>
+                  <div class="user-name">${group.name || 'Sans nom'}</div>
+                  <div class="user-email">${group.description || 'Pas de description'}</div>
+                </div>
+              </div>
+            </td>
+            <td>${group.creatorName || 'Inconnu'}</td>
+            <td><span class="badge bg-primary">${group.membersCount || 0}</span></td>
+            <td><span class="badge bg-info">${group.messagesCount || 0}</span></td>
+            <td>${createdAt}</td>
+            <td>
+              <button class="btn-icon" onclick="viewGroup('${group._id}')" title="Voir détails">
+                <i class="ri-eye-line"></i>
+              </button>
+              <button class="btn-icon" onclick="deleteGroup('${group._id}')" title="Supprimer">
+                <i class="ri-delete-bin-line"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      
+      html += `
+          </tbody>
+        </table>
+      `;
+      
+      container.innerHTML = html;
+    }
+    
+    function refreshGroups() {
+      const search = document.getElementById('group-search')?.value || '';
+      const sort = document.getElementById('group-sort')?.value || 'recent';
+      loadGroups(search, sort);
+    }
+    
+    async function deleteGroup(groupId) {
+      const confirmed = await swal({
+        title: "Êtes-vous sûr ?",
+        text: "Cette action supprimera le groupe et tous ses messages !",
+        icon: "warning",
+        buttons: ["Annuler", "Supprimer"],
+        dangerMode: true,
+      });
+      
+      if (confirmed) {
+        try {
+          const response = await fetch(`/api/admin/groups/${groupId}`, {
+            method: 'DELETE',
+            headers
+          });
+          
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            swal("Supprimé!", "Groupe supprimé avec succès", "success");
+            refreshGroups();
+          } else {
+            swal("Erreur!", data.message, "error");
+          }
+        } catch (error) {
+          swal("Erreur!", "Une erreur est survenue", "error");
+        }
+      }
+    }
+    
+    function viewGroup(groupId) {
+      swal("Info", "Détails du groupe à venir", "info");
+    }
+    
+    // ============================================
+    // MODÉRATION DES MESSAGES
+    // ============================================
+    
+    let currentMessagesPage = 1;
+    const messagesPerPage = 50;
+    
+    async function loadMessages(page = 1, search = '', filter = 'all') {
+      try {
+        const response = await fetch(
+          `/api/admin/messages?page=${page}&limit=${messagesPerPage}&search=${search}&filter=${filter}`,
+          { headers }
+        );
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          displayMessages(data.data.messages);
+          updateMessagesPagination(data.data.pagination);
+        }
+      } catch (error) {
+        console.error('Erreur chargement messages:', error);
+      }
+    }
+    
+    function displayMessages(messages) {
+      const container = document.getElementById('messages-table-container');
+      
+      if (!messages || messages.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted">Aucun message trouvé</p>';
+        return;
+      }
+      
+      let html = `
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Expéditeur</th>
+              <th>Message</th>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      messages.forEach(msg => {
+        const date = new Date(msg.createdAt).toLocaleString('fr-FR');
+        let messagePreview = msg.message || '';
+        if (messagePreview.length > 80) {
+          messagePreview = messagePreview.substring(0, 80) + '...';
+        }
+        
+        let typeIcon = '<i class="ri-message-3-line"></i>';
+        if (msg.type === 'file') typeIcon = '<i class="ri-file-line"></i>';
+        if (msg.type === 'image') typeIcon = '<i class="ri-image-line"></i>';
+        if (msg.type === 'video') typeIcon = '<i class="ri-video-line"></i>';
+        if (msg.type === 'audio') typeIcon = '<i class="ri-music-line"></i>';
+        
+        html += `
+          <tr>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">${msg.senderName?.charAt(0).toUpperCase() || 'U'}</div>
+                <div>
+                  <div class="user-name">${msg.senderName || 'Utilisateur'}</div>
+                  <div class="user-email">${msg.recipientName || 'Destinataire'}</div>
+                </div>
+              </div>
+            </td>
+            <td>${messagePreview || '<i>Fichier multimédia</i>'}</td>
+            <td>${typeIcon} ${msg.type || 'text'}</td>
+            <td style="font-size: 12px;">${date}</td>
+            <td>
+              <button class="btn-icon" onclick="viewMessage('${msg._id}')" title="Voir">
+                <i class="ri-eye-line"></i>
+              </button>
+              <button class="btn-icon" onclick="deleteMessage('${msg._id}')" title="Supprimer">
+                <i class="ri-delete-bin-line"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      
+      html += `
+          </tbody>
+        </table>
+      `;
+      
+      container.innerHTML = html;
+    }
+    
+    function updateMessagesPagination(pagination) {
+      currentMessagesPage = pagination.page;
+      document.getElementById('messages-page-info').textContent = 
+        `Page ${pagination.page} / ${pagination.pages || 1}`;
+      
+      document.getElementById('prev-messages').disabled = pagination.page <= 1;
+      document.getElementById('next-messages').disabled = pagination.page >= (pagination.pages || 1);
+    }
+    
+    function refreshMessages() {
+      const search = document.getElementById('message-search')?.value || '';
+      const filter = document.getElementById('message-filter')?.value || 'all';
+      loadMessages(currentMessagesPage, search, filter);
+    }
+    
+    function loadPreviousMessages() {
+      if (currentMessagesPage > 1) {
+        loadMessages(currentMessagesPage - 1);
+      }
+    }
+    
+    function loadNextMessages() {
+      loadMessages(currentMessagesPage + 1);
+    }
+    
+    async function deleteMessage(messageId) {
+      const confirmed = await swal({
+        title: "Supprimer ce message ?",
+        text: "Cette action est irréversible",
+        icon: "warning",
+        buttons: ["Annuler", "Supprimer"],
+        dangerMode: true,
+      });
+      
+      if (confirmed) {
+        try {
+          const response = await fetch(`/api/admin/messages/${messageId}`, {
+            method: 'DELETE',
+            headers
+          });
+          
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            swal("Supprimé!", "Message supprimé", "success");
+            refreshMessages();
+          } else {
+            swal("Erreur!", data.message, "error");
+          }
+        } catch (error) {
+          swal("Erreur!", "Une erreur est survenue", "error");
+        }
+      }
+    }
+    
+    function viewMessage(messageId) {
+      swal("Info", "Détails du message à venir", "info");
+    }
+    
+    // ============================================
+    // GESTION DES ADMINISTRATEURS
+    // ============================================
+    
+    async function loadAdmins() {
+      try {
+        const response = await fetch('/api/admin/admins', { headers });
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          displayAdmins(data.data.admins);
+        }
+      } catch (error) {
+        console.error('Erreur chargement admins:', error);
+      }
+    }
+    
+    function displayAdmins(admins) {
+      const container = document.getElementById('admins-table-container');
+      
+      if (!admins || admins.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted">Aucun administrateur trouvé</p>';
+        return;
+      }
+      
+      let html = `
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Rôle</th>
+              <th>Statut</th>
+              <th>Dernière connexion</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      admins.forEach(admin => {
+        const lastLogin = admin.lastLogin 
+          ? new Date(admin.lastLogin).toLocaleString('fr-FR')
+          : 'Jamais';
+        
+        const roleClass = admin.role === 'super_admin' ? 'danger' : 'warning';
+        const roleName = admin.role === 'super_admin' ? 'Super Admin' : 
+                        admin.role === 'admin' ? 'Admin' : 'Moderator';
+        
+        const statusClass = admin.status === 'active' ? 'success' : 'secondary';
+        const statusText = admin.status === 'active' ? 'Actif' : 'Inactif';
+        
+        const canDelete = adminData.role === 'super_admin' && admin.role !== 'super_admin';
+        
+        html += `
+          <tr>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">${admin.name?.charAt(0).toUpperCase() || 'A'}</div>
+                <div>
+                  <div class="user-name">${admin.name || 'Administrateur'}</div>
+                </div>
+              </div>
+            </td>
+            <td>${admin.email}</td>
+            <td><span class="badge bg-${roleClass}">${roleName}</span></td>
+            <td><span class="badge bg-${statusClass}">${statusText}</span></td>
+            <td style="font-size: 12px;">${lastLogin}</td>
+            <td>
+              <button class="btn-icon" onclick="viewAdmin('${admin._id}')" title="Voir détails">
+                <i class="ri-eye-line"></i>
+              </button>
+              ${canDelete ? `
+                <button class="btn-icon" onclick="deleteAdmin('${admin._id}')" title="Supprimer">
+                  <i class="ri-delete-bin-line"></i>
+                </button>
+              ` : ''}
+            </td>
+          </tr>
+        `;
+      });
+      
+      html += `
+          </tbody>
+        </table>
+      `;
+      
+      container.innerHTML = html;
+      
+      // Masquer le bouton créer admin si pas super_admin
+      if (adminData.role !== 'super_admin') {
+        document.getElementById('create-admin-btn').style.display = 'none';
+      }
+    }
+    
+    function showCreateAdminModal() {
+      const modal = new bootstrap.Modal(document.getElementById('createAdminModal'));
+      modal.show();
+    }
+    
+    async function createAdmin() {
+      const name = document.getElementById('new-admin-name').value;
+      const email = document.getElementById('new-admin-email').value;
+      const password = document.getElementById('new-admin-password').value;
+      const role = document.getElementById('new-admin-role').value;
+      
+      const permissions = {
+        canDeleteUsers: document.getElementById('perm-delete-users').checked,
+        canBlockUsers: document.getElementById('perm-block-users').checked,
+        canViewMessages: document.getElementById('perm-view-messages').checked,
+        canManageGroups: document.getElementById('perm-manage-groups').checked,
+        canViewStats: document.getElementById('perm-view-stats').checked
+      };
+      
+      if (!name || !email || !password) {
+        swal("Erreur", "Tous les champs sont obligatoires", "error");
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/admin/admins', {
+          method: 'POST',
+          headers: {
+            ...headers,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, email, password, role, permissions })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          swal("Succès!", "Administrateur créé avec succès", "success");
+          bootstrap.Modal.getInstance(document.getElementById('createAdminModal')).hide();
+          document.getElementById('createAdminForm').reset();
+          loadAdmins();
+        } else {
+          swal("Erreur!", data.message, "error");
+        }
+      } catch (error) {
+        swal("Erreur!", "Une erreur est survenue", "error");
+      }
+    }
+    
+    async function deleteAdmin(adminId) {
+      const confirmed = await swal({
+        title: "Supprimer cet administrateur ?",
+        text: "Cette action est irréversible",
+        icon: "warning",
+        buttons: ["Annuler", "Supprimer"],
+        dangerMode: true,
+      });
+      
+      if (confirmed) {
+        try {
+          const response = await fetch(`/api/admin/admins/${adminId}`, {
+            method: 'DELETE',
+            headers
+          });
+          
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            swal("Supprimé!", "Administrateur supprimé", "success");
+            loadAdmins();
+          } else {
+            swal("Erreur!", data.message, "error");
+          }
+        } catch (error) {
+          swal("Erreur!", "Une erreur est survenue", "error");
+        }
+      }
+    }
+    
+    function viewAdmin(adminId) {
+      swal("Info", "Détails de l'administrateur à venir", "info");
+    }
+    
+    // ============================================
+    // PARAMÈTRES ET MAINTENANCE
+    // ============================================
+    
+    function saveSettings() {
+      swal("Succès!", "Paramètres sauvegardés avec succès", "success");
+    }
+    
+    async function backupDatabase() {
+      const confirmed = await swal({
+        title: "Sauvegarder la base de données ?",
+        text: "Cette opération peut prendre quelques minutes",
+        icon: "info",
+        buttons: ["Annuler", "Continuer"],
+      });
+      
+      if (confirmed) {
+        try {
+          const response = await fetch('/api/admin/backup', {
+            method: 'POST',
+            headers
+          });
+          
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            swal("Succès!", "Sauvegarde créée avec succès", "success");
+          } else {
+            swal("Erreur!", data.message, "error");
+          }
+        } catch (error) {
+          swal("Erreur!", "Erreur lors de la sauvegarde", "error");
+        }
+      }
+    }
+    
+    async function exportData() {
+      const confirmed = await swal({
+        title: "Exporter les données ?",
+        text: "Format: CSV ou JSON",
+        icon: "info",
+        buttons: ["Annuler", "Exporter"],
+      });
+      
+      if (confirmed) {
+        try {
+          const response = await fetch('/api/admin/export', {
+            method: 'POST',
+            headers
+          });
+          
+          if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `gberetalk-export-${Date.now()}.csv`;
+            a.click();
+            swal("Succès!", "Données exportées", "success");
+          } else {
+            swal("Erreur!", "Erreur lors de l'export", "error");
+          }
+        } catch (error) {
+          swal("Erreur!", "Erreur lors de l'export", "error");
+        }
+      }
+    }
+    
+    async function cleanupData() {
+      const confirmed = await swal({
+        title: "Nettoyer les données ?",
+        text: "Cette action supprimera les messages et fichiers de plus de 6 mois",
+        icon: "warning",
+        buttons: ["Annuler", "Nettoyer"],
+        dangerMode: true,
+      });
+      
+      if (confirmed) {
+        try {
+          const response = await fetch('/api/admin/cleanup', {
+            method: 'POST',
+            headers
+          });
+          
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            swal("Succès!", `${data.data.deletedCount} éléments supprimés`, "success");
+          } else {
+            swal("Erreur!", data.message, "error");
+          }
+        } catch (error) {
+          swal("Erreur!", "Erreur lors du nettoyage", "error");
+        }
+      }
+    }
+    
+    // Navigation
+    document.querySelectorAll('.menu-item').forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Retirer active de tous
+        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Cacher toutes les sections
+        document.querySelectorAll('[id$="-section"]').forEach(s => s.style.display = 'none');
+        
+        // Afficher la section sélectionnée
+        const section = this.dataset.section;
+        const sectionEl = document.getElementById(`${section}-section`);
+        if (sectionEl) {
+          sectionEl.style.display = 'block';
+        }
+        
+        // Mettre à jour le titre
+        const titles = {
+          'dashboard': 'Tableau de bord',
+          'users': 'Gestion des Utilisateurs',
+          'groups': 'Gestion des Groupes',
+          'messages': 'Modération des Messages',
+          'admins': 'Gestion des Administrateurs',
+          'settings': 'Paramètres'
+        };
+        document.getElementById('page-title').textContent = titles[section] || section;
+        
+        // Charger les données selon la section
+        if (section === 'users') {
+          loadUsers();
+        } else if (section === 'groups') {
+          loadGroups();
+        } else if (section === 'messages') {
+          loadMessages();
+        } else if (section === 'admins') {
+          loadAdmins();
+        }
+      });
+    });
+    
+    // Recherche et filtre utilisateurs
+    let searchTimeout;
+    document.getElementById('user-search')?.addEventListener('input', function() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        const search = this.value;
+        const filter = document.getElementById('user-filter').value;
+        loadUsers(search, filter);
+      }, 500);
+    });
+    
+    document.getElementById('user-filter')?.addEventListener('change', function() {
+      const search = document.getElementById('user-search').value;
+      loadUsers(search, this.value);
+    });
+    
+    // Recherche et filtre groupes
+    document.getElementById('group-search')?.addEventListener('input', function() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        const sort = document.getElementById('group-sort').value;
+        loadGroups(this.value, sort);
+      }, 500);
+    });
+    
+    document.getElementById('group-sort')?.addEventListener('change', function() {
+      const search = document.getElementById('group-search').value;
+      loadGroups(search, this.value);
+    });
+    
+    // Recherche et filtre messages
+    document.getElementById('message-search')?.addEventListener('input', function() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        const filter = document.getElementById('message-filter').value;
+        loadMessages(1, this.value, filter);
+      }, 500);
+    });
+    
+    document.getElementById('message-filter')?.addEventListener('change', function() {
+      const search = document.getElementById('message-search').value;
+      loadMessages(1, search, this.value);
+    });
+    
+    // Déconnexion
+    function logout() {
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_data');
+      window.location.href = '/admin/login';
+    }
+    
+    // Charger les données au démarrage
+    loadDashboardStats();
+  </script>
+</body>
+</html>

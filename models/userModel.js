@@ -46,6 +46,28 @@ const userSchema = new mongoose.Schema({
         enum: ['Disponible', 'Occupé(e)'],
         default: 'Disponible'
     },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
+    isBlocked: {
+        type: Boolean,
+        default: false
+    },
+    blockedAt: Date,
+    blockedBy: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Admin'
+    },
+    blockReason: String,
+    lastActive: {
+        type: Date,
+        default: Date.now
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
