@@ -3,6 +3,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const upload = require('express-fileupload');
 const userRouter = require('./routes/userRouters');
+const adminRouter = require('./routes/adminRouters');
 
 const app = express();
 app.use(upload());
@@ -32,6 +33,17 @@ app.use((req, res, next) => {
 
 // 3) Routes
 app.use('/api/v1/users', userRouter);
+app.use('/api/admin', adminRouter);
+
+// Routes pour les pages admin
+app.get('/admin/login', (req, res) => {
+    res.render('admin-login');
+});
+
+app.get('/admin/dashboard', (req, res) => {
+    res.render('admin-dashboard');
+});
+
 app.use('/', userRouter);
 
 // Error handling

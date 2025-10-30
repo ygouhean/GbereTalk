@@ -68,6 +68,9 @@ const {
 const { log } = require("console");
 dotenv.config({ path: "./config.env" });
 
+// Configuration Mongoose pour éviter l'avertissement de dépréciation
+mongoose.set('strictQuery', false);
+
 /* ---------for Local database connection---------- */
 /* ---------const DB = process.env.DATABASE_LOCAL; ----------*/
 
@@ -89,8 +92,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Socket
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
-const PORT = process.env.PORT;
-http.listen(PORT, () => console.log(`Serveur en cours d'exécution sur le port ${PORT}`));
+const PORT = process.env.PORT || 2000;
+http.listen(PORT, () => {
+    console.log(`Serveur en cours d'exécution sur le port ${PORT}`);});
 app.use(express.static(__dirname + "/public"));
 
 const activeUsers = new Set();

@@ -195,6 +195,10 @@ exports.reset_password = async (req, res) => {
  * Home Page
  */
 exports.home = async (req, res) => {
+    // Si l'utilisateur est authentifié, le rediriger vers le chat
+    if (req.cookies && req.cookies.jwt) {
+        return res.redirect('/chat');
+    }
     res.status(200).render('home');
 };
 

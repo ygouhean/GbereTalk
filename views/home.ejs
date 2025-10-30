@@ -4,16 +4,28 @@
 <head>
   <meta charset="utf-8" />
   <title>GbêrêTalk - Plateforme de Communication Moderne</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta content="GbêrêTalk - Votre plateforme de communication moderne pour rester connecté" name="description" />
   <meta content="GbêrêTalk" name="author" />
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#0066ff">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="GbêrêTalk">
+  <link rel="manifest" href="/manifest.json">
+  
   <!-- Favicon -->
   <link rel="shortcut icon" href="assets/images/favicon.ico">
+  <link rel="apple-touch-icon" href="assets/images/favicon.png">
 
   <!-- CSS personnalisé -->
   <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
   <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
+  <!-- Mobile Responsive Css -->
+  <link href="assets/css/mobile-responsive.css" rel="stylesheet" type="text/css" />
 
   <style>
     :root {
@@ -612,7 +624,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2024 GbêrêTalk. Tous droits réservés. Fait avec <i class="ri-heart-fill" style="color: #33cc33;"></i> pour connecter le monde.</p>
+        <p>&copy; 2025 GbêrêTalk. Tous droits réservés. Fait avec <i class="ri-heart-fill" style="color: #33cc33;"></i> pour connecter le monde.</p>
       </div>
     </div>
   </footer>
@@ -620,6 +632,13 @@
   <!-- Scripts -->
   <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/service-worker.js').catch(function(err){
+          console.log('SW registration failed:', err);
+        });
+      });
+    }
     // Animation au scroll et gestion du header
     document.addEventListener('DOMContentLoaded', function() {
       const header = document.getElementById('header');

@@ -2833,11 +2833,35 @@ function removeEditMsg(image) {
 }
 
 // Message Scrolle Top/ Bottom 
+// Remplacez la fonction existante
 function scrollToBottom() {
-  var simpleBar = document.querySelector("#messageBody .simplebar-content-wrapper");
-  var offsetHeight = document.getElementsByClassName("messages__history")[0] ? document.getElementsByClassName("messages__history")[0].scrollHeight - window.innerHeight + 250 : 0;
-  if (offsetHeight)
-    simpleBar.scrollTo({ top: offsetHeight, behavior: "smooth" });
+  const wrapper = document.querySelector("#messageBody .simplebar-content-wrapper");
+  const content = document.querySelector("#messageBody .simplebar-content");
+  if (wrapper && content) {
+    wrapper.scrollTo({ top: content.scrollHeight, behavior: "smooth" });
+    return;
+  }
+  const box = document.querySelector(".messages__history");
+  if (box) box.scrollTop = box.scrollHeight;
+}
+
+// A AJOUTER une fois le DOM prêt (après vos sélecteurs inputField/messageBox)
+if (typeof inputField !== 'undefined' && inputField) {
+  inputField.addEventListener('focus', () => {
+    setTimeout(scrollToBottom, 150); // clavier mobile
+  });
+}
+
+// Recalage sur changements de layout mobile
+window.addEventListener('resize', () => {
+  setTimeout(scrollToBottom, 150);
+});
+
+// Sécurité: après append d’un message, laissez un léger délai
+// (si vous avez des endroits où vous faites: messageBox.innerHTML += ...)
+function appendWithScroll(html) {
+  messageBox.insertAdjacentHTML('beforeend', html);
+  setTimeout(scrollToBottom, 50);
 }
 
 // Message Pagination
@@ -3563,29 +3587,65 @@ function startCall(ctype) {
 
   navigator.mediaDevices.getUserMedia({
     video: videoConstraints,
-    audio: true
+    audio: {
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true
+    }
   }).then((stream) => {
     console.log('Stream média obtenu:', stream); // Debug
     localStream = stream
-    let configuration;
-    if (videoConstraints != false) {
-      document.getElementById("local-video").srcObject = localStream;
-      configuration = {
-        iceServers: [{
-          "urls": ["stun:stun.l.google.com:19302",
+    
+    // Configuration améliorée avec serveurs STUN/TURN
+    const configuration = {
+      iceServers: [
+        {
+          urls: [
+            "stun:stun.l.google.com:19302",
             "stun:stun1.l.google.com:19302",
-            "stun:stun2.l.google.com:19302"
+            "stun:stun2.l.google.com:19302",
+            "stun:stun3.l.google.com:19302",
+            "stun:stun4.l.google.com:19302"
           ]
-        }]
+        },
+        {
+          urls: "turn:openrelay.metered.ca:80",
+          username: "openrelayproject",
+          credential: "openrelayproject"
+        },
+        {
+          urls: "turn:openrelay.metered.ca:443",
+          username: "openrelayproject",
+          credential: "openrelayproject"
+        }
+      ],
+      iceCandidatePoolSize: 10
+    };
+    
+    peerConn = new RTCPeerConnection(configuration);
+    
+    // Utiliser la nouvelle API addTrack au lieu de addStream
+    stream.getTracks().forEach(track => {
+      console.log('Ajout de la piste:', track.kind);
+      peerConn.addTrack(track, stream);
+    });
+    
+    // Afficher la vidéo locale
+    if (videoConstraints !== false) {
+      const localVideo = document.getElementById("local-video");
+      if (localVideo) {
+        localVideo.srcObject = stream;
       }
     }
-    peerConn = new RTCPeerConnection(configuration)
-    peerConn.addStream(localStream)
 
-    peerConn.onaddstream = (e) => {
-      document.getElementById("remote-video")
-        .srcObject = e.stream
-    }
+    // Utiliser la nouvelle API ontrack au lieu de onaddstream
+    peerConn.ontrack = (event) => {
+      console.log('Réception de piste distante:', event.track.kind);
+      const remoteVideo = document.getElementById("remote-video");
+      if (remoteVideo && event.streams && event.streams[0]) {
+        remoteVideo.srcObject = event.streams[0];
+      }
+    };
 
     peerConn.onicecandidate = ((e) => {
       if (e.candidate == null)
@@ -3594,7 +3654,19 @@ function startCall(ctype) {
         type: "store_candidate",
         candidate: e.candidate
       })
-    })
+    });
+    
+    // Gestion de l'état de la connexion
+    peerConn.onconnectionstatechange = () => {
+      console.log('État de connexion:', peerConn.connectionState);
+      if (peerConn.connectionState === 'connected') {
+        console.log('✅ Connexion WebRTC établie avec succès');
+        toastr.success('Connexion établie', 'Succès');
+      } else if (peerConn.connectionState === 'failed') {
+        console.error('❌ Échec de la connexion WebRTC');
+        toastr.error('Échec de la connexion, réessayez', 'Erreur');
+      }
+    };
 
     createAndSendOffer()
   }).catch((error) => {
@@ -3642,28 +3714,66 @@ function joinCall(jctype, userId, rspid) {
 
   navigator.mediaDevices.getUserMedia({
     video: videoConstraints,
-    audio: true
+    audio: {
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true
+    }
   }).then((stream) => {
     console.log('Stream média obtenu pour joinCall:', stream); // Debug
     localStream = stream
-    let configuration
-    if (videoConstraints != false) {
-      document.getElementById("local-video").srcObject = localStream
-      configuration = {
-        iceServers: [{
-          "urls": ["stun:stun.l.google.com:19302",
+    
+    // Configuration améliorée avec serveurs STUN/TURN
+    const configuration = {
+      iceServers: [
+        {
+          urls: [
+            "stun:stun.l.google.com:19302",
             "stun:stun1.l.google.com:19302",
-            "stun:stun2.l.google.com:19302"
+            "stun:stun2.l.google.com:19302",
+            "stun:stun3.l.google.com:19302",
+            "stun:stun4.l.google.com:19302"
           ]
-        }]
+        },
+        {
+          urls: "turn:openrelay.metered.ca:80",
+          username: "openrelayproject",
+          credential: "openrelayproject"
+        },
+        {
+          urls: "turn:openrelay.metered.ca:443",
+          username: "openrelayproject",
+          credential: "openrelayproject"
+        }
+      ],
+      iceCandidatePoolSize: 10
+    };
+    
+    peerConn = new RTCPeerConnection(configuration);
+    
+    // Utiliser la nouvelle API addTrack au lieu de addStream
+    stream.getTracks().forEach(track => {
+      console.log('Ajout de la piste:', track.kind);
+      peerConn.addTrack(track, stream);
+    });
+    
+    // Afficher la vidéo locale
+    if (videoConstraints !== false) {
+      const localVideo = document.getElementById("local-video");
+      if (localVideo) {
+        localVideo.srcObject = stream;
       }
     }
-    peerConn = new RTCPeerConnection(configuration)
-    peerConn.addStream(localStream)
-    peerConn.onaddstream = (e) => {
-      document.getElementById("remote-video")
-        .srcObject = e.stream
-    }
+    
+    // Utiliser la nouvelle API ontrack au lieu de onaddstream
+    peerConn.ontrack = (event) => {
+      console.log('Réception de piste distante:', event.track.kind);
+      const remoteVideo = document.getElementById("remote-video");
+      if (remoteVideo && event.streams && event.streams[0]) {
+        remoteVideo.srcObject = event.streams[0];
+      }
+    };
+    
     peerConn.onicecandidate = ((e) => {
       if (e.candidate == null)
         return
@@ -3672,7 +3782,20 @@ function joinCall(jctype, userId, rspid) {
         type: "send_candidate",
         candidate: e.candidate
       })
-    })
+    });
+    
+    // Gestion de l'état de la connexion
+    peerConn.onconnectionstatechange = () => {
+      console.log('État de connexion:', peerConn.connectionState);
+      if (peerConn.connectionState === 'connected') {
+        console.log('✅ Connexion WebRTC établie avec succès');
+        toastr.success('Connexion établie', 'Succès');
+      } else if (peerConn.connectionState === 'failed') {
+        console.error('❌ Échec de la connexion WebRTC');
+        toastr.error('Échec de la connexion, réessayez', 'Erreur');
+      }
+    };
+    
     sendData({
       type: "join_call"
     })
@@ -3696,25 +3819,45 @@ function joinCall(jctype, userId, rspid) {
       console.log('Tentative de fallback vers appel audio seulement');
       navigator.mediaDevices.getUserMedia({
         video: false,
-        audio: true
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        }
       }).then((audioStream) => {
         console.log('Fallback audio réussi');
         localStream = audioStream;
         document.getElementById("video-call-div").style.display = "none";
         
-        let configuration = {
-          iceServers: [{
-            "urls": ["stun:stun.l.google.com:19302",
-              "stun:stun1.l.google.com:19302",
-              "stun:stun2.l.google.com:19302"
-            ]
-          }]
+        const configuration = {
+          iceServers: [
+            {
+              urls: [
+                "stun:stun.l.google.com:19302",
+                "stun:stun1.l.google.com:19302",
+                "stun:stun2.l.google.com:19302",
+                "stun:stun3.l.google.com:19302",
+                "stun:stun4.l.google.com:19302"
+              ]
+            },
+            {
+              urls: "turn:openrelay.metered.ca:80",
+              username: "openrelayproject",
+              credential: "openrelayproject"
+            }
+          ],
+          iceCandidatePoolSize: 10
         };
         
         peerConn = new RTCPeerConnection(configuration);
-        peerConn.addStream(localStream);
         
-        peerConn.onaddstream = (e) => {
+        // Utiliser addTrack au lieu de addStream
+        audioStream.getTracks().forEach(track => {
+          peerConn.addTrack(track, audioStream);
+        });
+        
+        // Utiliser ontrack au lieu de onaddstream
+        peerConn.ontrack = (event) => {
           console.log('Stream distant reçu en mode audio');
         };
         
@@ -3725,6 +3868,10 @@ function joinCall(jctype, userId, rspid) {
             candidate: e.candidate
           });
         });
+        
+        peerConn.onconnectionstatechange = () => {
+          console.log('État connexion audio:', peerConn.connectionState);
+        };
         
         sendData({
           type: "join_call"

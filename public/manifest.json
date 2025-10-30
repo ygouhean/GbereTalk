@@ -1,0 +1,51 @@
+{
+  "name": "GbêrêTalk - Plateforme de Communication",
+  "short_name": "GbêrêTalk",
+  "description": "Votre plateforme de communication moderne pour rester connecté avec vos proches, collègues et communautés",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0066ff",
+  "theme_color": "#0066ff",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/assets/images/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/images/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "communication", "productivity"],
+  "lang": "fr-FR",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Nouveau Message",
+      "short_name": "Message",
+      "description": "Envoyer un nouveau message",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/assets/images/favicon.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/images/gberetalk.png",
+      "type": "image/png",
+      "sizes": "1280x720"
+    }
+  ]
+}
+
